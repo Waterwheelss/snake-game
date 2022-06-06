@@ -128,7 +128,7 @@ function checkCollision() {
   if (snake.getHead() !== snake.getTail()) {
     let currentBody: SnakeBody = head;
     do {
-      currentBody = currentBody.getPrevBody();
+      currentBody = currentBody.getPrevBody()!;
 
       const prevPosition = currentBody?.prevPosition!;
 
