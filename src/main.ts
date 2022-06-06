@@ -12,6 +12,7 @@ import {
   TILE_SIZE,
 } from "./constant";
 import { Snake } from "./Snake";
+import { SnakeBody } from "./SnakeBody";
 import "./style.css";
 
 /**
@@ -32,6 +33,12 @@ const context = canvas.getContext("2d")!;
 
 const snake = new Snake(240, 240);
 
+let gameStatus = "stop";
+
+function setGameStatus(status: "start" | "stop" | "over") {
+  gameStatus = status;
+}
+
 function render() {
   initializeCanvas();
 
@@ -40,7 +47,22 @@ function render() {
 
   checkCollision();
 
-  setTimeout(render, 1000 / 20);
+  const id = setTimeout(render, 1000 / 20);
+
+  checkGameStatus(id);
+}
+
+function checkGameStatus(id: number) {
+  if (gameStatus === "over") {
+    clearTimeout(id);
+    gameover();
+  }
+}
+
+function gameover() {
+  context.font = "36px Roboto";
+  context.fillStyle = "#fff";
+  context.fillText("GAME OVER", 150, 260, 200);
 }
 
 function initializeCanvas() {
@@ -80,9 +102,42 @@ function checkCollision() {
   const head = snake.getHead();
   const position = head.getPosition();
 
+  /**
+   * If Get Apple
+   */
   if (position.x === applePosition.x && position.y === applePosition.y) {
     snake.addLength();
     getApple = true;
+  }
+
+  /**
+   * If hit the wall
+   */
+  if (
+    position.x === 0 - TILE_SIZE ||
+    position.x === CANVAS_WIDTH ||
+    position.y === 0 - TILE_SIZE ||
+    position.y === CANVAS_HEIGHT
+  ) {
+    setGameStatus("over");
+  }
+
+  /**
+   * If hit snake body
+   */
+  if (snake.getHead() !== snake.getTail()) {
+    let currentBody: SnakeBody = head;
+    do {
+      currentBody = currentBody.getPrevBody();
+
+      const prevPosition = currentBody?.prevPosition!;
+
+      if (prevPosition.x === position.x && prevPosition.y === position.y) {
+        setGameStatus("over");
+      }
+
+      console.log(prevPosition.x, position.x);
+    } while (currentBody.getPrevBody() !== null);
   }
 }
 

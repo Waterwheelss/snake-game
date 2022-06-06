@@ -19,6 +19,10 @@ export class Snake {
     return this.snakeHead;
   }
 
+  getTail() {
+    return this.snakeTail;
+  }
+
   addLength() {
     const newTail = this.snakeTail.addSnakeBody();
 
